@@ -12,9 +12,14 @@ At the moment AudioJack only supports Mac OS X.
 Demo
 ----
 
-There is a demo project in [the test branch]
-(https://github.com/keijiro/AudioJack/tree/test) of the repository.
-You can find the detailed usage there.
+There is a demo project in [the test branch of the repository]
+(https://github.com/keijiro/AudioJack/tree/test).
+
+![Demo](http://keijiro.github.io/AudioJack/demo.png)
+
+It shows the signal levels of each input channel (behind) and each octave
+band (front). The color of the bars changes when it exceeds specified levels
+(yellow: -3db, red: 0db).
 
 Usage
 -----
@@ -30,6 +35,8 @@ Usage
 Note: *You have to restart Unity to switch to another audio interface.*
 
 There are some parameters in the AudioJack component.
+
+![Inspector](http://keijiro.github.io/AudioJack/inspector.png)
 
 - Band Type - specifies the number of octave bands.
 - Channel Select - The spectrum analyzer can only handle one audio stream, so
