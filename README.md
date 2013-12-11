@@ -34,7 +34,8 @@ Setting Up
 2. Import **AudioJackPlugin.bundle** into '**Plugins**' folder in
    your project.
 3. Import **AudioJack.cs**.
-4. Create a new game object and add the **AudioJack** script component to it.
+4. Import **AudioJackEditor.cs** into '**Editor**' folder.
+5. Create a new game object and add the **AudioJack** script component to it.
 
 Note: *You have to restart Unity to switch to another audio interface.*
 
