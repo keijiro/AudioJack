@@ -7,8 +7,6 @@ Unity apps. It is highly optimized and uses low-latency audio APIs to process
 the audio input. And therefore you can use the plug-in to make
 well-synchronized audio-visual apps.
 
-At the moment AudioJack only supports Mac OS X.
-
 Demo
 ----
 
@@ -20,6 +18,12 @@ There is a demo project in [the test branch of the repository]
 It shows the signal levels of each input channel (behind) and each octave
 band (front). The color of the bars changes when it exceeds specified levels
 (yellow: -3db, red: 0db).
+
+System requirement
+------------------
+
+- Currently supports only Mac OS X.
+- Requires Unity Pro to enable native plug-in feature.
 
 Usage
 -----
