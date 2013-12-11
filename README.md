@@ -19,14 +19,14 @@ It shows the signal levels of each input channel (behind) and each octave
 band (front). The color of the bars changes when it exceeds specified levels
 (yellow: -3db, red: 0db).
 
-System requirement
+System Requirement
 ------------------
 
 - Currently supports only Mac OS X.
 - Requires Unity Pro to enable native plug-in feature.
 
-Usage
------
+Setting Up
+----------
 
 1. Before launching Unity, select an audio interface for capturing the
    audio signals in [the system sound preferences]
@@ -37,6 +37,9 @@ Usage
 4. Create a new game object and add the **AudioJack** script component to it.
 
 Note: *You have to restart Unity to switch to another audio interface.*
+
+Component Properties
+--------------------
 
 There are some parameters in the AudioJack component.
 
@@ -61,8 +64,8 @@ The analyzer puts the result into two public properties.
 These values are represented in decibel units (dbFS). The maximum value is
 +3db and the lower bound is -infinite.
 
-Source code
------------
+See Also
+--------
 
 The source code for the native module is stored in another repository.
 
