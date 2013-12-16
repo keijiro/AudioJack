@@ -44,18 +44,16 @@ Component Properties
 
 There are some parameters in the AudioJack component.
 
-![Inspector](http://keijiro.github.io/AudioJack/inspector.png)
+![Inspector](http://keijiro.github.io/AudioJack/inspector2.png)
 
 - Band Type - specifies the number of octave bands.
-- Channel Select - The spectrum analyzer can only handle one audio stream, so
-  you have to choose whether or not to mix multiple channels before analysis.
-  You can specify one channel (Discrete), mix two consecutive channels
-  (MixStereo) or mix the all channels (MixAll).
-- Channel To Analyze - specifies a channel for analyzing spectrum.
-- Minimum Interval - specifies the minimum interval time. You can save CPU
-  load by setting a long interval time.
-- Internal Mode - analyzes the audio output from Unity instead of the
-  external audio input.
+- Interval - specifies the minimum interval time. You can save CPU load by
+  setting a long interval time.
+- External Audio - switches the audio input source.
+- Mix Mode and Channel Select - The spectrum analyzer can only handle one audio
+  stream, so you have to choose whether or not to mix multiple channels before
+  spectrum analysis. You can specify one channel (Discrete), mix two
+  consecutive channels (Mix L + R) or mix the all channels (Mix All).
 
 The analyzer puts the result into two public properties.
 
