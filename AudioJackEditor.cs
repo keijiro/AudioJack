@@ -24,55 +24,175 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections;
 
-[CustomEditor(typeof(AudioJack))]
+[CustomEditor(typeof(AudioJack)), CanEditMultipleObjects]
 public class AudioJackEditor : Editor
 {
-    bool showLevels = false;
-    bool showSpectrum = false;
+    #region Reference to properties
+
+    SerializedProperty propBandType;
+    SerializedProperty propMinimumInterval;
+    SerializedProperty propInternalMode;
+    SerializedProperty propChannelToAnalyze;
+    SerializedProperty propChannelSelect;
+    SerializedProperty propShowLevels;
+    SerializedProperty propShowSpectrum;
+
+    #endregion
+
+    #region UI constants and variables
+
+    static string[] bandTypeLabels = {
+        "4 Band", "8 Band", "10 Band (Standard)", "26 Band"
+    };
+    static int[] BandTypeValues = {
+        0, 1, 2, 3
+    };
+    static string[] mixModeLabels = {
+        "Discrete", "Mix L + R", "Mix All"
+    };
+    static int[] mixModeValues = {
+        0, 1, 2
+    };
+    string[] channelLabels;
+    int[] channelOptions;
+
+    #endregion
+
+    #region Editor functions
+
+    void OnEnable ()
+    {
+        propBandType = serializedObject.FindProperty ("bandType");
+        propMinimumInterval = serializedObject.FindProperty ("minimumInterval");
+        propInternalMode = serializedObject.FindProperty ("internalMode");
+        propChannelToAnalyze = serializedObject.FindProperty ("channelToAnalyze");
+        propChannelSelect = serializedObject.FindProperty ("channelSelect");
+        propShowLevels = serializedObject.FindProperty ("showLevels");
+        propShowSpectrum = serializedObject.FindProperty ("showSpectrum");
+    }
 
     public override void OnInspectorGUI ()
     {
-        var audioJack = target as AudioJack;
+        // Update the properties.
+        serializedObject.Update ();
 
-        DrawDefaultInspector ();
+        // Basic settings.
+        propBandType.intValue = EditorGUILayout.IntPopup ("Band Type", propBandType.intValue, bandTypeLabels, BandTypeValues);
+        EditorGUILayout.Slider (propMinimumInterval, 0.0f, 1.0f, "Interval");
 
-        // Channel level bars.
-        showLevels = EditorGUILayout.Foldout (showLevels, "Channel Levels");
-        if (showLevels)
-            DisplayLevelBars (audioJack.ChannelLevels);
-
-        // Band level bars.
-        showSpectrum = EditorGUILayout.Foldout (showSpectrum, "Spectrum");
-        if (showSpectrum)
-            DisplayLevelBars (audioJack.BandLevels);
-
-        if ((showLevels || showSpectrum) && EditorApplication.isPlaying)
+        // Input settings.
+        propInternalMode.boolValue = !EditorGUILayout.Toggle ("External Audio", !propInternalMode.boolValue);
+        if (propInternalMode.boolValue)
         {
-            // Make itself dirty to update on every time.
-            EditorUtility.SetDirty (target);
+            EditorGUILayout.HelpBox ("The External Audio option is disabled. Captures audio data from the Audio Listener.", MessageType.None);
         }
+        else
+        {
+            propChannelSelect.intValue = EditorGUILayout.IntPopup ("Mix Mode", propChannelSelect.intValue, mixModeLabels, mixModeValues);
+            if (propChannelSelect.intValue == 2)
+            {
+                EditorGUILayout.HelpBox ("Mix All Mode. Mixes all input channels.", MessageType.None);
+            }
+            else
+            {
+                var channel = UpdateAndShowChannelOptions ();
+                if (propChannelSelect.intValue == 0)
+                    EditorGUILayout.HelpBox ("Discrete Mode. Handles audio signals from channel #" + channel + ".", MessageType.None);
+                else
+                    EditorGUILayout.HelpBox ("Mix L + R Mode. Mixes audio signals from channel #" + channel + " and #" + (channel + 1) + ".", MessageType.None);
+            }
+        }
+
+        // Level meters.
+        if (!serializedObject.isEditingMultipleObjects)
+        {
+            var audioJack = target as AudioJack;
+            
+            // Channel level bars.
+            EditorGUILayout.Space ();
+            propShowLevels.boolValue = EditorGUILayout.Foldout (propShowLevels.boolValue, "Channel Levels");
+            if (propShowLevels.boolValue)
+                DisplayLevelBars (audioJack.ChannelLevels);
+            
+            // Band level bars.
+            EditorGUILayout.Space ();
+            propShowSpectrum.boolValue = EditorGUILayout.Foldout (propShowSpectrum.boolValue, "Spectrum");
+            if (propShowSpectrum.boolValue)
+                DisplayLevelBars (audioJack.BandLevels);
+            
+            // Make itself dirty to update on every time.
+            if ((propShowLevels.boolValue || propShowSpectrum.boolValue) && EditorApplication.isPlaying)
+            {
+                EditorUtility.SetDirty (target);
+            }
+        }
+
+        // Apply modifications.
+        serializedObject.ApplyModifiedProperties ();
     }
 
-    void DisplayLevelBars(float[] levels)
+    #endregion
+
+    #region Private functions
+
+    int UpdateAndShowChannelOptions ()
+    {
+        var count = AudioJack.AudioJackCountChannels ();
+
+        if (propChannelSelect.intValue == (int)AudioJack.ChannelSelect.MixStereo)
+            count--;
+
+        if (count == 1)
+        {
+            // There is only one option.
+            channelLabels = null;
+            channelOptions = null;
+            propChannelToAnalyze.intValue = 0;
+            return 0;
+        }
+
+        if (channelLabels == null || channelLabels.Length != count)
+        {
+            // Make arrays.
+            channelLabels = new string[count];
+            channelOptions = new int[count];
+            for (var i = 0; i < count; i++)
+            {
+                channelLabels [i] = i.ToString ();
+                channelOptions [i] = i;
+            }
+        }
+
+        // Show the pop-up.
+        var choice = EditorGUILayout.IntPopup ("Channel", propChannelToAnalyze.intValue, channelLabels, channelOptions);
+        propChannelToAnalyze.intValue = choice;
+
+        return choice;
+    }
+
+    void DisplayLevelBars (float[] levels)
     {
         if (EditorApplication.isPlaying)
         {
-            foreach (var db in levels)
+            for (var i = 0; i < levels.Length; i++)
             {
+                var db = levels[i];
                 var width = Mathf.Clamp (1.0f + db / 40, 0.01f, 1.0f);
                 var text = db.ToString ("0.0") + " dB";
-                var rect = EditorGUILayout.BeginVertical ();
-                
+                // Show the channel number.
+                var rect = GUILayoutUtility.GetRect (18, 18, "TextField");
+                EditorGUI.LabelField (rect, "#" + i);
+                // Show the level bar.
+                rect.x += rect.width * 0.1f;
+                rect.width *= 0.9f;
                 EditorGUI.ProgressBar (rect, width, text);
-                EditorGUILayout.Space ();
-                EditorGUILayout.Space ();
-                EditorGUILayout.Space ();
-                EditorGUILayout.EndVertical ();
             }
         }
         else
         {
-            EditorGUILayout.HelpBox ("You can view the sutatus on Play Mode.", MessageType.Info);
+            EditorGUILayout.HelpBox ("You can view the sutatus only on Play Mode.", MessageType.None);
         }
     }
+
+    #endregion
 }
