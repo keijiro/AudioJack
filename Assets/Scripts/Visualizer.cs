@@ -3,10 +3,17 @@ using System.Collections;
 
 public class Visualizer : MonoBehaviour
 {
+	public static int MaxDataVisualizeLength = 32;
+
 	#region Public properties
+	public enum Mode {
+		Level,
+		Spectrum,
+		Data
+	}
 
     public GameObject barPrefab;
-	public bool spectrumMode;
+	public Mode mode;
     
 	#endregion
 
@@ -20,9 +27,25 @@ public class Visualizer : MonoBehaviour
 
     void Update ()
     {
-		var target = spectrumMode ? AudioJack.instance.BandLevels : AudioJack.instance.ChannelLevels;
+		float[] target = null;
+		int targetLength = 0;
 
-        if (barCount == target.Length)
+		switch(mode) {
+		case Mode.Level:
+			target = AudioJack.instance.ChannelLevels;
+			targetLength = target.Length;
+			break;
+		case Mode.Spectrum:
+			target = AudioJack.instance.BandLevels;
+			targetLength = target.Length;
+			break;
+		case Mode.Data:
+			target = AudioJack.instance.Data;
+			targetLength = Mathf.Min (target.Length, MaxDataVisualizeLength);
+			break;
+		}
+
+		if (barCount == targetLength)
             return;
 
         // Destroy the old bars.
@@ -30,7 +53,7 @@ public class Visualizer : MonoBehaviour
             Destroy ((child as Transform).gameObject);
 
         // Change the number of bars.
-        barCount = target.Length;
+		barCount = targetLength;
         var barWidth = 6.0f / barCount;
         var barScale = new Vector3 (barWidth * 0.9f, 1, 0.75f);
 
@@ -42,7 +65,7 @@ public class Visualizer : MonoBehaviour
             
 			var controller = bar.GetComponent<BarController> ();
 			controller.index = i;
-			controller.spectrumMode = spectrumMode;
+			controller.mode = mode;
 
 			bar.transform.parent = transform;
             bar.transform.localScale = barScale;
