@@ -7,6 +7,7 @@ public class BarController : MonoBehaviour
 
     public int index;
     public Visualizer.Mode mode;
+	public AudioJack audiojack;
 
     #endregion
 
@@ -29,13 +30,13 @@ public class BarController : MonoBehaviour
 		float[] levels = null;
 		switch(mode) {
 		case Visualizer.Mode.Level:
-			levels = AudioJack.instance.ChannelLevels;
+			levels = audiojack.ChannelLevels;
 			break;
 		case Visualizer.Mode.Spectrum:
-			levels = AudioJack.instance.BandLevels;
+			levels = audiojack.BandLevels;
 			break;
 		case Visualizer.Mode.Data:
-			levels = AudioJack.instance.Data;
+			levels = audiojack.Data;
 			break;
 		}
 

@@ -12,6 +12,7 @@ public class Visualizer : MonoBehaviour
 		Data
 	}
 
+	public AudioJack audiojack;
     public GameObject barPrefab;
 	public Mode mode;
     
@@ -32,15 +33,15 @@ public class Visualizer : MonoBehaviour
 
 		switch(mode) {
 		case Mode.Level:
-			target = AudioJack.instance.ChannelLevels;
+			target = audiojack.ChannelLevels;
 			targetLength = target.Length;
 			break;
 		case Mode.Spectrum:
-			target = AudioJack.instance.BandLevels;
+			target = audiojack.BandLevels;
 			targetLength = target.Length;
 			break;
 		case Mode.Data:
-			target = AudioJack.instance.Data;
+			target = audiojack.Data;
 			targetLength = Mathf.Min (target.Length, MaxDataVisualizeLength);
 			break;
 		}
@@ -66,6 +67,7 @@ public class Visualizer : MonoBehaviour
 			var controller = bar.GetComponent<BarController> ();
 			controller.index = i;
 			controller.mode = mode;
+			controller.audiojack = audiojack;
 
 			bar.transform.parent = transform;
             bar.transform.localScale = barScale;

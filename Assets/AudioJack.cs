@@ -123,7 +123,7 @@ public class AudioJack : MonoBehaviour
         var points = fftSpectrum.Length;
         var index = Mathf.FloorToInt (f / sampleRate * 2.0f * points);
         return Mathf.Clamp (index, 0, points - 1);
-    }
+	}
 
     #endregion
 
@@ -175,7 +175,10 @@ public class AudioJack : MonoBehaviour
 
         bandLevels = new float[middleFrequenciesForBands [(int)bandType].Length];
         channelLevels = new float[AudioJackCountChannels ()];
-    }
+		var sampleRate = internalMode ? AudioSettings.outputSampleRate : AudioJackGetSampleRate ();
+		var sampleCount = Mathf.CeilToInt(sampleRate * sampleLengthInSeconds);
+		rawData = new float[sampleCount];
+	}
 
     void Update ()
     {
