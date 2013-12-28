@@ -72,8 +72,11 @@ public class AudioJack : MonoBehaviour
     public BandType bandType = BandType.TenBand;
 
     // Channel selection.
-    public int channelToAnalyze;
-    public ChannelSelect channelSelect = ChannelSelect.MixStereo;
+	public int channelToAnalyze;
+	public ChannelSelect channelSelect = ChannelSelect.MixStereo;
+
+	// Sampling: sampling length(for raw data)
+	public float sampleLengthInSeconds = 0.1f;
 
     // Timekeeping.
     public float minimumInterval = 0.0f;
@@ -95,6 +98,10 @@ public class AudioJack : MonoBehaviour
         get { return channelLevels; }
     }
 
+	public float[] Data {
+		get { return rawData; }
+ 	}
+
     // Reference to the last created instance.
     static public AudioJack instance;
 
@@ -103,7 +110,8 @@ public class AudioJack : MonoBehaviour
     #region Private variables and functions
 
     // Internal buffers.
-    float[] fftSpectrum;
+	float[] rawData;
+	float[] fftSpectrum;
     float[] bandLevels;
     float[] channelLevels;
 
@@ -115,7 +123,7 @@ public class AudioJack : MonoBehaviour
         var points = fftSpectrum.Length;
         var index = Mathf.FloorToInt (f / sampleRate * 2.0f * points);
         return Mathf.Clamp (index, 0, points - 1);
-    }
+	}
 
     #endregion
 
@@ -123,14 +131,16 @@ public class AudioJack : MonoBehaviour
 
 #if UNITY_STANDALONE_OSX
     [DllImport ("AudioJackPlugin")]
-	public static extern int AudioJackCountChannels ();
-    [DllImport ("AudioJackPlugin")]
-	public static extern float AudioJackGetSampleRate ();
+    public static extern int AudioJackCountChannels ();
+     [DllImport ("AudioJackPlugin")]
+    public static extern float AudioJackGetSampleRate ();
     [DllImport ("AudioJackPlugin")]
     public static extern float AudioJackGetChannelLevel (int channel);
-    [DllImport ("AudioJackPlugin")]
+	[DllImport ("AudioJackPlugin")]
 	public static extern void AudioJackGetSpectrum (int channel, int mode, int pointNumber, float[] spectrum);
-#else
+	[DllImport ("AudioJackPlugin")]
+	public static extern void AudioJackGetRawData (int channel, float[] data, int samples);
+	#else
 	public static int AudioJackCountChannels ()
     {
         return 1;
@@ -165,7 +175,10 @@ public class AudioJack : MonoBehaviour
 
         bandLevels = new float[middleFrequenciesForBands [(int)bandType].Length];
         channelLevels = new float[AudioJackCountChannels ()];
-    }
+		var sampleRate = internalMode ? AudioSettings.outputSampleRate : AudioJackGetSampleRate ();
+		var sampleCount = Mathf.CeilToInt(sampleRate * sampleLengthInSeconds);
+		rawData = new float[sampleCount];
+	}
 
     void Update ()
     {
@@ -208,7 +221,23 @@ public class AudioJack : MonoBehaviour
         var sampleRate = internalMode ? AudioSettings.outputSampleRate : AudioJackGetSampleRate ();
         var frequencies = middleFrequenciesForBands [(int)bandType];
         var bandwidth = bandwidthForBands [(int)bandType];
-        
+		var sampleCount = Mathf.CeilToInt(sampleRate * sampleLengthInSeconds);
+
+		if( rawData == null || rawData.Length != sampleCount ) {
+			rawData = new float[sampleCount];
+		}
+		// get raw data
+		if (internalMode)
+		{
+			AudioListener.GetOutputData(rawData,channelToAnalyze);
+		}
+		else
+		{
+			Debug.Log ("sample:"+sampleCount);
+			AudioJackGetRawData (channelToAnalyze, rawData, sampleCount);
+		}
+		 
+
         for (var bi = 0; bi < bandCount; bi++)
         {
             // Specify the spectrum range of the band.

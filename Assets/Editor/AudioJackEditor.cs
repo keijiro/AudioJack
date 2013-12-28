@@ -35,7 +35,8 @@ public class AudioJackEditor : Editor
     SerializedProperty propChannelToAnalyze;
     SerializedProperty propChannelSelect;
     SerializedProperty propShowLevels;
-    SerializedProperty propShowSpectrum;
+	SerializedProperty propShowSpectrum;
+	SerializedProperty propSampleLengthInSeconds;
 
     #endregion
 
@@ -68,8 +69,9 @@ public class AudioJackEditor : Editor
         propChannelToAnalyze = serializedObject.FindProperty ("channelToAnalyze");
         propChannelSelect = serializedObject.FindProperty ("channelSelect");
         propShowLevels = serializedObject.FindProperty ("showLevels");
-        propShowSpectrum = serializedObject.FindProperty ("showSpectrum");
-    }
+		propShowSpectrum = serializedObject.FindProperty ("showSpectrum");
+		propSampleLengthInSeconds = serializedObject.FindProperty ("sampleLengthInSeconds");
+	}
 
     public override void OnInspectorGUI ()
     {
@@ -79,6 +81,8 @@ public class AudioJackEditor : Editor
         // Basic settings.
         propBandType.intValue = EditorGUILayout.IntPopup ("Band Type", propBandType.intValue, bandTypeLabels, BandTypeValues);
         EditorGUILayout.Slider (propMinimumInterval, 0.0f, 1.0f, "Interval");
+
+		EditorGUILayout.Slider (propSampleLengthInSeconds, 0.0f, 2.0f, "Sample Length(sec.)");
 
         // Input settings.
         propInternalMode.boolValue = !EditorGUILayout.Toggle ("External Audio", !propInternalMode.boolValue);
