@@ -1,5 +1,5 @@
-AudioJack - External Audio Analyzer for Unity
-=============================================
+AudioJack
+=========
 
 **AudioJack** is an external audio processing plugin for Unity. It allows Unity
 apps to analyze the external audio signals and obtain frequency spectrum
