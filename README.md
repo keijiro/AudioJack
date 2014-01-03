@@ -1,29 +1,29 @@
 AudioJack - External Audio Analyzer for Unity
 =============================================
 
-**AudioJack** is an external audio processing plug-in for Unity.
-It analyzes the external audio input and provides audio spectrum data for
-Unity apps. It is highly optimized and uses low-latency audio APIs to process
-the audio input. And therefore you can use the plug-in to make
-well-synchronized audio-visual apps.
+**AudioJack** is an external audio processing plugin for Unity. It allows Unity
+apps to analyze the external audio signals and obtain frequency spectrum
+information. The plugin is highly optimized and utilizes low-latency signal
+processing APIs, and therefore allows Unity apps to react to the external audio
+signals without any significant delay.
 
-Demo
-----
+Sample
+------
 
-There is a demo project in [the test branch of the repository]
+There is a sample project in [the test branch of this repository]
 (https://github.com/keijiro/AudioJack/tree/test).
 
 ![Demo](http://keijiro.github.io/AudioJack/demo.png)
 
 It shows the signal levels of each input channel (behind) and each octave
-band (front). The color of the bars changes when it exceeds specified levels
-(yellow: -3db, red: 0db).
+band (front). The color of the bars changes when it exceeds specific levels
+(yellow: -3dB, red: 0dB).
 
-System Requirement
-------------------
+System Requirements
+-------------------
 
 - Currently supports only Mac OS X.
-- Requires Unity Pro to enable native plug-in feature.
+- Requires Unity Pro.
 
 Setting Up
 ----------
@@ -42,31 +42,32 @@ Note: *You have to restart Unity to switch to another audio interface.*
 Component Properties
 --------------------
 
-There are some parameters in the AudioJack component.
+There are some options in the AudioJack component.
 
 ![Inspector](http://keijiro.github.io/AudioJack/inspector2.png)
 
-- Band Type - specifies the number of octave bands.
+- Octave Band Type - specifies the number of octave bands.
 - Interval - specifies the minimum interval time. You can save CPU load by
   setting a long interval time.
 - External Audio - switches the audio input source.
 - Mix Mode and Channel Select - The spectrum analyzer can only handle one audio
   stream, so you have to choose whether or not to mix multiple channels before
-  spectrum analysis. You can specify one channel (Discrete), mix two
+  spectrum analysis. You can specify one channel (Mono), mix two
   consecutive channels (Mix L + R) or mix the all channels (Mix All).
 
-The analyzer puts the result into two public properties.
+The analyzer puts the result into three public properties.
 
-- float [] BandLevels - The levels of each octave band.
-- float [] ChannelLevels - The RMS levels of each channel.
+- float [] OctaveBandSpectrum - contains the levels of each octave band.
+- float [] RawSpectrum - contains the result of Fourier transform.
+- float [] ChannelLevels - contains the RMS levels of each channel.
 
-These values are represented in decibel units (dbFS). The maximum value is
-+3db and the lower bound is -infinite.
+These values are represented in decibel units (dBFS). The maximum value is
++3dB and the lower bound is -infinite.
 
-See Also
---------
+Related Project
+---------------
 
-The source code for the native module is stored in another repository.
+The source code for the native module is in another repository.
 
 [AudioJackPlugin for OS X]
 (https://github.com/keijiro/AudioJackPlugin)
@@ -74,7 +75,7 @@ The source code for the native module is stored in another repository.
 License
 -------
 
-Copyright (C) 2013 Keijiro Takahashi
+Copyright (C) 2013, 2014 Keijiro Takahashi
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
