@@ -7,8 +7,8 @@ information. The plugin is highly optimized and utilizes low-latency signal
 processing APIs, and therefore allows Unity apps to react to the external audio
 signals without any significant delay.
 
-Sample
-------
+Sample Project
+--------------
 
 There is a sample project in [the test branch of this repository]
 (https://github.com/keijiro/AudioJack/tree/test).
@@ -28,7 +28,7 @@ System Requirements
 Setting Up
 ----------
 
-1. Before launching Unity, select an audio interface for capturing the
+1. Before launching Unity, select an audio interface for capturing
    audio signals in [the system sound preferences]
    (http://support.apple.com/kb/PH13972).
 2. Import **AudioJackPlugin.bundle** into '**Plugins**' folder in
