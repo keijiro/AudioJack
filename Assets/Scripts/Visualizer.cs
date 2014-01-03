@@ -20,7 +20,7 @@ public class Visualizer : MonoBehaviour
 
     void Update ()
     {
-		var target = spectrumMode ? AudioJack.instance.BandLevels : AudioJack.instance.ChannelLevels;
+		var target = spectrumMode ? AudioJack.instance.OctaveBandSpectrum : AudioJack.instance.ChannelRmsLevels;
 
         if (barCount == target.Length)
             return;
@@ -32,7 +32,7 @@ public class Visualizer : MonoBehaviour
         // Change the number of bars.
         barCount = target.Length;
         var barWidth = 6.0f / barCount;
-        var barScale = new Vector3 (barWidth * 0.9f, 1, 0.75f);
+        var barScale = new Vector3 (barWidth * 0.9f, 0.01f, 0.75f);
 
         // Create new bars.
         for (var i = 0; i < barCount; i++)

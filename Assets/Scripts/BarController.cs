@@ -25,7 +25,7 @@ public class BarController : MonoBehaviour
 
     void Update ()
     {
-		var levels = spectrumMode ? AudioJack.instance.BandLevels : AudioJack.instance.ChannelLevels;
+		var levels = spectrumMode ? AudioJack.instance.OctaveBandSpectrum : AudioJack.instance.ChannelRmsLevels;
 
         if (index < levels.Length)
         {
